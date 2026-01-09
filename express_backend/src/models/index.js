@@ -4,6 +4,7 @@ const { WorkflowStatus } = require("./WorkflowStatus");
 const { Task, TASK_PRIORITIES } = require("./Task");
 const { Comment } = require("./Comment");
 const { ActivityLog, ACTIVITY_TYPES } = require("./ActivityLog");
+const { RefreshToken } = require("./RefreshToken");
 
 module.exports = {
   User,
@@ -20,6 +21,8 @@ module.exports = {
   Comment,
 
   ActivityLog,
-  ACTIVITY_TYPES
+  ACTIVITY_TYPES,
+
+  RefreshToken
 };
 

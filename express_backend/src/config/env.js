@@ -14,8 +14,11 @@ const envSchema = Joi.object({
   // Required now that DB connection is part of server startup.
   MONGODB_URI: Joi.string().uri().required(),
 
-  // Not required in this skeleton step, but validated if provided.
-  JWT_SECRET: Joi.string().min(16).optional(),
+  // Auth (required for this step)
+  JWT_SECRET: Joi.string().min(16).required(),
+  JWT_REFRESH_SECRET: Joi.string().min(16).default(Joi.ref("JWT_SECRET")),
+  TOKEN_EXPIRY: Joi.string().default("15m"),
+  REFRESH_TOKEN_EXPIRY: Joi.string().default("30d"),
 
   // If empty/undefined, we handle permissive CORS in development.
   CORS_ORIGIN: Joi.string().allow("").optional()
@@ -34,6 +37,11 @@ module.exports = {
   nodeEnv: value.NODE_ENV,
   port: value.PORT,
   mongoDbUri: value.MONGODB_URI,
+
   jwtSecret: value.JWT_SECRET,
+  jwtRefreshSecret: value.JWT_REFRESH_SECRET,
+  tokenExpiry: value.TOKEN_EXPIRY,
+  refreshTokenExpiry: value.REFRESH_TOKEN_EXPIRY,
+
   corsOrigin: value.CORS_ORIGIN
 };
