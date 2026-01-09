@@ -11,8 +11,8 @@ const envSchema = Joi.object({
   NODE_ENV: Joi.string().valid("development", "test", "production").default("development"),
   PORT: Joi.number().integer().min(1).max(65535).default(3001),
 
-  // Not required in this skeleton step, but validated if provided.
-  MONGODB_URI: Joi.string().uri().optional(),
+  // Required now that DB connection is part of server startup.
+  MONGODB_URI: Joi.string().uri().required(),
 
   // Not required in this skeleton step, but validated if provided.
   JWT_SECRET: Joi.string().min(16).optional(),

@@ -7,6 +7,7 @@ const { nodeEnv, corsOrigin } = require("./config/env");
 const apiRouter = require("./routes");
 const { notFoundHandler } = require("./middleware/notFound");
 const { errorHandler } = require("./middleware/errorHandler");
+const { getDbHealth } = require("./db/mongoose");
 
 function createCorsOptions() {
   // In dev, allow all by default unless CORS_ORIGIN is set.
@@ -37,8 +38,32 @@ function createApp() {
 
   // PUBLIC_INTERFACE
   app.get("/health", (req, res) => {
-    /** Health-check endpoint. Returns simple status for load balancers. */
-    res.status(200).json({ status: "ok" });
+    /** Liveness probe endpoint. Process is up; may be degraded if DB is down. */
+    const db = getDbHealth();
+    const isOk = db.status === "connected";
+    res.status(isOk ? 200 : 200).json({
+      status: "ok",
+      db: {
+        status: db.status,
+        lastConnectedAt: db.lastConnectedAt,
+        lastError: db.lastError
+      }
+    });
+  });
+
+  // PUBLIC_INTERFACE
+  app.get("/ready", (req, res) => {
+    /** Readiness probe endpoint. Returns 200 only when DB connection is established. */
+    const db = getDbHealth();
+    const isReady = db.status === "connected";
+    res.status(isReady ? 200 : 503).json({
+      status: isReady ? "ready" : "not_ready",
+      db: {
+        status: db.status,
+        lastConnectedAt: db.lastConnectedAt,
+        lastError: db.lastError
+      }
+    });
   });
 
   app.use("/api/v1", apiRouter);
